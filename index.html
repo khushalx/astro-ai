@@ -7,39 +7,46 @@
 
   <style>
     body {
-      background: radial-gradient(circle at top, #001100, #000);
-      color: #0f0;
+      margin: 0;
       font-family: monospace;
+      background: radial-gradient(circle at top, #001100, #000);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
+      color: #0f0;
     }
 
     .chat-container {
       width: 100%;
       max-width: 420px;
+      background: #050505;
       border: 1px solid #0f0;
       border-radius: 12px;
-      padding: 15px;
-      background: #050505;
-      box-shadow: 0 0 20px rgba(0,255,0,0.3);
+      padding: 16px;
+      box-shadow: 0 0 25px rgba(0,255,0,0.3);
       display: flex;
       flex-direction: column;
+    }
+
+    .title {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
     }
 
     .chat-box {
       height: 320px;
       overflow-y: auto;
-      margin-bottom: 12px;
       display: flex;
       flex-direction: column;
+      margin-bottom: 10px;
     }
 
     .message {
-      margin: 6px 0;
       padding: 8px 10px;
+      margin: 6px 0;
       border-radius: 8px;
       max-width: 85%;
       word-wrap: break-word;
@@ -70,35 +77,28 @@
     input {
       flex: 1;
       padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #0f0;
       background: #111;
       color: #0f0;
-      border: 1px solid #0f0;
-      border-radius: 6px;
-      outline: none;
       font-size: 14px;
+      outline: none;
     }
 
     button {
       padding: 10px 14px;
+      border-radius: 6px;
+      border: none;
       background: #0f0;
       color: #000;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
       font-weight: bold;
+      cursor: pointer;
       transition: 0.2s ease;
     }
 
     button:hover {
       background: #00cc00;
       transform: scale(1.05);
-    }
-
-    .title {
-      text-align: center;
-      margin-bottom: 10px;
-      font-weight: bold;
-      letter-spacing: 1px;
     }
   </style>
 </head>
@@ -117,8 +117,6 @@
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwQRscxVhnZlrm_BRF6qEjkO5JLNogMHTh-YltF8o037gEthyb51BdxVoNlKoVDv2wm1Q/exec";
-
 const chat = document.getElementById("chat");
 const input = document.getElementById("msg");
 
@@ -144,21 +142,23 @@ function send() {
 
   const typing = addMessage("🤖 Thinking...", "bot");
 
-  fetch(API_URL, {
+  fetch("/api/chat", {
     method: "POST",
-    body: new URLSearchParams({
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
       message: text
     })
   })
-  .then(res => res.text())  // Important for HtmlService
-  .then(raw => {
+  .then(res => res.json())
+  .then(data => {
     typing.remove();
-    const data = JSON.parse(raw);
     addMessage("🤖 " + data.reply, "bot");
   })
   .catch(err => {
     typing.remove();
-    addMessage("❌ Bot not responding", "error");
+    addMessage("❌ Server error", "error");
     console.error(err);
   });
 }
