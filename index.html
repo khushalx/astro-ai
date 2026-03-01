@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Astro AI</title>
+
+  <style>
+    body {
+      background: #000;
+      color: #0f0;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid #0f0;
+      border-radius: 10px;
+      padding: 15px;
+      background: #050505;
+      box-shadow: 0 0 15px rgba(0,255,0,0.2);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-box {
+      height: 300px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      padding-right: 5px;
+    }
+
+    .message {
+      margin: 6px 0;
+      padding: 6px 8px;
+      border-radius: 6px;
+      max-width: 85%;
+      word-wrap: break-word;
+    }
+
+    .user {
+      background: #003300;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background: #111;
+      border: 1px solid #0f0;
+      align-self: flex-start;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 5px;
+    }
+
+    input {
+      flex: 1;
+      padding: 8px;
+      background: #111;
+      color: #0f0;
+      border: 1px solid #0f0;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    button {
+      padding: 8px 12px;
+      background: #0f0;
+      color: #000;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #00cc00;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="chat-container">
+  <div id="chat" class="chat-box"></div>
+
+  <div class="input-area">
+    <input id="msg" placeholder="Ask about space..." />
+    <button onclick="send()">Send</button>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbyQyaP9KZ9xqsFUT2uQzJZHkHx0lHmyeVveHNTCUaIcIGcZpeQATEyiv_KwjpkqZ3CZBg/exec";
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("msg");
+
+// Send on Enter key
+input.addEventListener("keypress", function(e) {
+  if (e.key === "Enter") send();
+});
+
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.classList.add("message", type);
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+function send() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  addMessage("👤 " + text, "user");
+  input.value = "";
+
+  const typing = addMessage("🤖 Thinking...", "bot");
+
+  fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ message: text })
+  })
+  .then(res => res.json())
+  .then(data => {
+    typing.remove();
+    addMessage("🤖 " + data.reply, "bot");
+  })
+  .catch(() => {
+    typing.remove();
+    addMessage("❌ Bot not responding", "error");
+  });
+}
+</script>
+
+</body>
+</html>
