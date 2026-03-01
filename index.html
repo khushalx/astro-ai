@@ -33,7 +33,6 @@
       height: 300px;
       overflow-y: auto;
       margin-bottom: 10px;
-      padding-right: 5px;
     }
 
     .message {
@@ -102,12 +101,11 @@
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyQyaP9KZ9xqsFUT2uQzJZHkHx0lHmyeVveHNTCUaIcIGcZpeQATEyiv_KwjpkqZ3CZBg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzeYsOFCpPouzVa69Q2uxym-1kGN61ikqe4wuH2zlNfkD7rTPhUcdd2A0C520AYYFY76g/exec";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("msg");
 
-// Send on Enter key
 input.addEventListener("keypress", function(e) {
   if (e.key === "Enter") send();
 });
@@ -132,10 +130,9 @@ function send() {
 
   fetch(API_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ message: text })
+    body: new URLSearchParams({
+      message: text
+    })
   })
   .then(res => res.json())
   .then(data => {
