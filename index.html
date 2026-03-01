@@ -7,7 +7,7 @@
 
   <style>
     body {
-      background: #000;
+      background: radial-gradient(circle at top, #001100, #000);
       color: #0f0;
       font-family: monospace;
       display: flex;
@@ -21,26 +21,29 @@
       width: 100%;
       max-width: 420px;
       border: 1px solid #0f0;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 15px;
       background: #050505;
-      box-shadow: 0 0 15px rgba(0,255,0,0.2);
+      box-shadow: 0 0 20px rgba(0,255,0,0.3);
       display: flex;
       flex-direction: column;
     }
 
     .chat-box {
-      height: 300px;
+      height: 320px;
       overflow-y: auto;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      flex-direction: column;
     }
 
     .message {
       margin: 6px 0;
-      padding: 6px 8px;
-      border-radius: 6px;
+      padding: 8px 10px;
+      border-radius: 8px;
       max-width: 85%;
       word-wrap: break-word;
+      font-size: 14px;
     }
 
     .user {
@@ -56,35 +59,46 @@
 
     .error {
       color: red;
+      font-weight: bold;
     }
 
     .input-area {
       display: flex;
-      gap: 5px;
+      gap: 6px;
     }
 
     input {
       flex: 1;
-      padding: 8px;
+      padding: 10px;
       background: #111;
       color: #0f0;
       border: 1px solid #0f0;
-      border-radius: 5px;
+      border-radius: 6px;
       outline: none;
+      font-size: 14px;
     }
 
     button {
-      padding: 8px 12px;
+      padding: 10px 14px;
       background: #0f0;
       color: #000;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
+      transition: 0.2s ease;
     }
 
     button:hover {
       background: #00cc00;
+      transform: scale(1.05);
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: bold;
+      letter-spacing: 1px;
     }
   </style>
 </head>
@@ -92,6 +106,8 @@
 <body>
 
 <div class="chat-container">
+  <div class="title">🚀 ASTRO AI</div>
+
   <div id="chat" class="chat-box"></div>
 
   <div class="input-area">
@@ -134,14 +150,16 @@ function send() {
       message: text
     })
   })
-  .then(res => res.json())
-  .then(data => {
+  .then(res => res.text())  // Important for HtmlService
+  .then(raw => {
     typing.remove();
+    const data = JSON.parse(raw);
     addMessage("🤖 " + data.reply, "bot");
   })
-  .catch(() => {
+  .catch(err => {
     typing.remove();
     addMessage("❌ Bot not responding", "error");
+    console.error(err);
   });
 }
 </script>
